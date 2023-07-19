@@ -22,14 +22,17 @@ export function TopSales() {
   return (
     <Table>
       <TableBody>
-        {data.map((order, index) => (
-          <TableRow key={index}>
-            <TableCell>{index + 1}</TableCell>
-            <TableCell>{order.name}</TableCell>
-            {/* <TableCell>{order.totalAmount}</TableCell> */}
-            <TableCell className="text-right">{order.count}</TableCell>
-          </TableRow>
-        ))}
+        {
+          // @ts-ignore
+          data.map((order, index) => (
+            <TableRow key={index}>
+              <TableCell>{index + 1}</TableCell>
+              <TableCell>{order.name}</TableCell>
+              {/* <TableCell>{order.totalAmount}</TableCell> */}
+              <TableCell className="text-right">{order.count}</TableCell>
+            </TableRow>
+          ))
+        }
       </TableBody>
     </Table>
   );
