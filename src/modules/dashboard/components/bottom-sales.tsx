@@ -3,13 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { QueryType } from "~/query";
 import axios from "axios";
 
-export function TopSales() {
+export function BottomSales() {
   const { data } = useQuery({
-    queryKey: [QueryType.TOP_PIZZAS],
+    queryKey: [QueryType.WORST_PIZZAS],
     queryFn: async () => {
       return axios
         .get("/api/orders", {
-          params: { type: QueryType.TOP_PIZZAS },
+          params: { type: QueryType.WORST_PIZZAS },
         })
         .then((res) => res.data);
     },

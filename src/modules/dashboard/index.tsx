@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { TopSales } from "./components/top-sales";
+import { BottomSales } from "./components/bottom-sales";
 import { GrossOverview } from "./components/gross-overview";
 import {
   Select,
@@ -133,7 +134,7 @@ export function Dashboard() {
               </Select>
             </CardHeader>
             <CardContent className="p-0">
-              <TopSales />
+              <BottomSales />
             </CardContent>
           </Card>
           <Card className="col-span-3">
