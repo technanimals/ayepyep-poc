@@ -61,19 +61,20 @@ export async function seed(knex: Knex): Promise<void> {
 
   await knex("order")
     .insert(
-      orders.map(({ order_id, order_date, order_time }) => ({
+      orders.map(({ order_id, order_date, order_time, total_price }) => ({
         id: order_id,
         date: new Date(),
+        total: total_price,
       }))
     )
     .onConflict("id")
     .ignore();
 
-  const orderItems = d.map(({ pizza_id, quantity, order_id, total_price }) => ({
+  const orderItems = d.map(({ pizza_id, quantity, order_id, unit_price }) => ({
     pizza_id,
     quantity,
     order_id,
-    total: total_price,
+    total: unit_price * quantity,
   }));
 
   const batches = chunk(orderItems, 1000);

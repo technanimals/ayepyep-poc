@@ -1,11 +1,15 @@
 import { Knex } from "knex";
 import env from "env-var";
-import "dotenv/config";
+import dotenv from "dotenv";
 // @ts-ignore
 import knexStringCase from "knex-stringcase";
 import { resolve } from "path";
 
 const root = process.cwd();
+
+dotenv.config({
+  path: ".env.local",
+});
 
 export const database = {
   url: env.get("DATABASE_URL").required().asString(),
@@ -20,6 +24,7 @@ export const config: Knex.Config = {
   pool: { min: 1, max: database.pool },
   migrations: {
     directory: resolve(root, "migrations"),
+    schemaName: "demo",
   },
   seeds: {
     directory: resolve(root, "seeds"),

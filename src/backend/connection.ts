@@ -11,6 +11,7 @@ export const getConnection = async () => {
   connection = knex({
     client: "pg",
     connection: config.url,
+    searchPath: ["demo", "public"],
     // debug: stage !== 'prod',
     debug: false,
     pool: { min: 1, max: config.pool },

@@ -6,7 +6,7 @@ export async function up(knex: Knex): Promise<void> {
     t.string("order_id").references("id").inTable("order").notNullable();
     t.integer("quantity").notNullable();
     t.primary(["pizza_id", "order_id"]);
-    t.float("price").notNullable();
+    t.float("total").notNullable();
     t.timestamps(true, true);
   });
 }
