@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { getConnection } from "~/backend/connection";
+import { Order } from "~/backend/models";
 
 import { QueryType } from "~/query";
 
@@ -20,10 +21,18 @@ const getPizzasSales = async (order: "DESC" | "ASC") => {
 
 const getTopPizzas = async () => getPizzasSales("DESC");
 const getWorstPizzas = async () => getPizzasSales("ASC");
+const countOrders = async () => {
+  const db = await getConnection();
+
+  const data = await Order.query(db).count("*").first();
+
+  return data;
+};
 
 const queries: Record<QueryType, () => Promise<any>> = {
   [QueryType.TOP_PIZZAS]: getTopPizzas,
   [QueryType.WORST_PIZZAS]: getWorstPizzas,
+  [QueryType.ORDER_COUNT]: countOrders,
 };
 
 export default async function orders(
@@ -37,6 +46,7 @@ export default async function orders(
   }
 
   const query = queries[type];
+
   if (!query) {
     return res.status(200).json([]);
   }
@@ -45,6 +55,8 @@ export default async function orders(
     const data = await query();
     res.status(200).json(data);
   } catch (error) {
+    console.log(error);
+
     res.status(400).send({});
   }
 }

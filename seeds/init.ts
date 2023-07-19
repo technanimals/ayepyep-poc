@@ -2,6 +2,8 @@ import { Knex } from "knex";
 import { resolve } from "path";
 import * as xlsx from "xlsx";
 import { chunk, unionBy, uniqBy } from "lodash";
+import { faker } from "@faker-js/faker";
+import { subMonths } from "date-fns";
 
 const excelFilePath = resolve(__dirname, "data.xlsx");
 
@@ -61,14 +63,19 @@ export async function seed(knex: Knex): Promise<void> {
 
   await knex("order")
     .insert(
-      orders.map(({ order_id, order_date, order_time, total_price }) => ({
-        id: order_id,
-        date: new Date(),
-        total: total_price,
-      }))
+      orders.map(({ order_id, total_price }) => {
+        const now = new Date();
+        const past = subMonths(now, 6);
+
+        return {
+          id: order_id,
+          date: faker.date.between({ from: past, to: now }),
+          total: total_price,
+        };
+      })
     )
     .onConflict("id")
-    .ignore();
+    .merge(["date"]);
 
   const orderItems = d.map(({ pizza_id, quantity, order_id, unit_price }) => ({
     pizza_id,

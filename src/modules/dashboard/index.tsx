@@ -10,8 +10,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { QueryType } from "~/query";
 
 export function Dashboard() {
+  const { data: revenueData, isLoading: revenueIsLoading } = useQuery({
+    queryKey: ["revenue"],
+    queryFn: async () => {
+      return axios.get("/api/revenue", {}).then((res) => res.data);
+    },
+  });
+
+  const { data, isLoading } = useQuery({
+    queryKey: [QueryType.ORDER_COUNT],
+    queryFn: async () => {
+      return axios
+        .get("/api/orders", {
+          params: { type: QueryType.ORDER_COUNT },
+        })
+        .then((res) => res.data);
+    },
+  });
+
+  const revenue =
+    revenueIsLoading || !revenueData?.revenue
+      ? "...Loading"
+      : revenueData?.revenue;
+
+  const orderCount = isLoading || !data?.count ? "...Loading" : data?.count;
+
   return (
     <>
       <div className="space-y-4">
@@ -21,21 +49,10 @@ export function Dashboard() {
               <CardTitle className="text-sm font-medium">
                 Total Revenue
               </CardTitle>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="h-4 w-4 text-muted-foreground"
-              >
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              </svg>
+              <span className="h-4 w-4 text-muted-foreground">ZAR</span>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$45,231.89</div>
+              <div className="text-2xl font-bold">{revenue}</div>
               <p className="text-xs text-muted-foreground">
                 +20.1% from last month
               </p>
@@ -43,26 +60,10 @@ export function Dashboard() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Subscriptions
-              </CardTitle>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="h-4 w-4 text-muted-foreground"
-              >
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
+              <CardTitle className="text-sm font-medium">Orders</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">+2350</div>
+              <div className="text-2xl font-bold">{orderCount}</div>
               <p className="text-xs text-muted-foreground">
                 +180.1% from last month
               </p>
@@ -94,7 +95,7 @@ export function Dashboard() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Now</CardTitle>
+              <CardTitle className="text-sm font-medium">Sales Today</CardTitle>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
