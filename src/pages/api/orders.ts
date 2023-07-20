@@ -12,7 +12,7 @@ const getPizzasSales = async (order: "DESC" | "ASC") => {
   SELECT pizza.name, s.count FROM pizza
   JOIN (
     SELECT pizza_id, count(pizza_id) as count FROM order_item
-    GROUP BY pizza_id ORDER BY count DESC LIMIT 5
+    GROUP BY pizza_id ORDER BY count ${order} LIMIT 5
   ) s on s.pizza_id = pizza.id ORDER BY s.count ${order};
   `);
 
