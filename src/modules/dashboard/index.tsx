@@ -43,6 +43,21 @@ export function Dashboard() {
   return (
     <>
       <div className="space-y-4">
+        <div className="flex flex-row">
+          <div className="flex-1"></div>
+          <Select value="weekly">
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select a date" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+                <SelectItem value="daily">Daily</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -121,18 +136,6 @@ export function Dashboard() {
           <Card className="col-span-3">
             <CardHeader>
               <CardTitle>Bottom 5 sales</CardTitle>
-              <Select value="weekly">
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select a date" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
-                    <SelectItem value="daily">Daily</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
             </CardHeader>
             <CardContent className="p-0">
               <BottomSales />
@@ -141,18 +144,6 @@ export function Dashboard() {
           <Card className="col-span-3">
             <CardHeader>
               <CardTitle>Top 5 sales</CardTitle>
-              <Select value="weekly">
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select a date" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
-                    <SelectItem value="daily">Daily</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
             </CardHeader>
             <CardContent className="p-0">
               <TopSales />
