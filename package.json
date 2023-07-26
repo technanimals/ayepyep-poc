@@ -29,7 +29,7 @@
     "knex-stringcase": "^1.4.6",
     "lodash": "^4.17.21",
     "lucide-react": "^0.261.0",
-    "next": "13.4.10",
+    "next": "^13.4.12",
     "objection": "^3.0.4",
     "pg": "^8.11.1",
     "postcss": "8.4.26",
