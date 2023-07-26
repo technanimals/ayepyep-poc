@@ -23,6 +23,9 @@ import {
   Twitter,
   User,
   X,
+  ScatterChart,
+  LineChartIcon,
+  FilePieChartIcon,
   type LucideIcon,
 } from "lucide-react";
 
@@ -50,6 +53,9 @@ export const Icons = {
   sun: SunMedium,
   moon: Moon,
   laptop: Laptop,
+  scatterChart: ScatterChart,
+  lineChartIcon: LineChartIcon,
+  filePieChartIcon: FilePieChartIcon,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"
