@@ -3,13 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { QueryType } from "~/query";
 import axios from "axios";
 
-export function TopSales() {
+export function TopSales(props: Props) {
+  const { date } = props;
   const { data } = useQuery({
-    queryKey: [QueryType.TOP_PIZZAS],
+    queryKey: [QueryType.TOP_PIZZAS, date],
     queryFn: async () => {
       return axios
         .get("/api/orders", {
-          params: { type: QueryType.TOP_PIZZAS },
+          params: { type: QueryType.TOP_PIZZAS, date },
         })
         .then((res) => res.data);
     },
@@ -36,4 +37,8 @@ export function TopSales() {
       </TableBody>
     </Table>
   );
+}
+
+interface Props {
+  date: string;
 }

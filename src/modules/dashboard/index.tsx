@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { TopSales } from "./components/top-sales";
 import { BottomSales } from "./components/bottom-sales";
-import { GrossOverview } from "./components/gross-overview";
 import {
   Select,
   SelectContent,
@@ -13,21 +12,25 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { QueryType } from "~/query";
+import { useState } from "react";
 
 export function Dashboard() {
+  const [date, setDate] = useState(getLast12Months()[11].date.toISOString());
   const { data: revenueData, isLoading: revenueIsLoading } = useQuery({
-    queryKey: ["revenue"],
+    queryKey: ["revenue", date],
     queryFn: async () => {
-      return axios.get("/api/revenue", {}).then((res) => res.data);
+      return axios
+        .get("/api/revenue", { params: { date } })
+        .then((res) => res.data);
     },
   });
 
   const { data, isLoading } = useQuery({
-    queryKey: [QueryType.ORDER_COUNT],
+    queryKey: [QueryType.ORDER_COUNT, date],
     queryFn: async () => {
       return axios
         .get("/api/orders", {
-          params: { type: QueryType.ORDER_COUNT },
+          params: { type: QueryType.ORDER_COUNT, date },
         })
         .then((res) => res.data);
     },
@@ -45,15 +48,17 @@ export function Dashboard() {
       <div className="space-y-4">
         <div className="flex flex-row">
           <div className="flex-1"></div>
-          <Select value="weekly">
+          <Select value={date} onValueChange={(value) => setDate(value)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select a date" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="daily">Daily</SelectItem>
+                {getLast12Months().map((el) => (
+                  <SelectItem value={el.date.toISOString()} key={el.name}>
+                    {el.name}
+                  </SelectItem>
+                ))}
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -138,7 +143,7 @@ export function Dashboard() {
               <CardTitle>Bottom 5 sales</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <BottomSales />
+              <BottomSales date={date} />
             </CardContent>
           </Card>
           <Card className="col-span-3">
@@ -146,21 +151,36 @@ export function Dashboard() {
               <CardTitle>Top 5 sales</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <TopSales />
-            </CardContent>
-          </Card>
-          <Card className="col-span-3">
-            <CardHeader>
-              <CardTitle>Gross</CardTitle>
-
-              {/* <CardDescription>You made 265 sales this month.</CardDescription> */}
-            </CardHeader>
-            <CardContent>
-              <GrossOverview />
+              <TopSales date={date} />
             </CardContent>
           </Card>
         </div>
       </div>
     </>
   );
+}
+
+function getLast12Months() {
+  const months = [];
+  const currentDate = new Date();
+
+  for (let i = 0; i < 12; i++) {
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+
+    const monthName = new Intl.DateTimeFormat("en-US", {
+      month: "long",
+    }).format(currentDate);
+    currentDate.setHours(0, 0, 0, 0); // Setting the hours to 0 to get the first day of the month
+    // set date to 1st of the month
+    currentDate.setDate(1);
+    months.push({
+      name: `${monthName} ${currentYear}`,
+      date: new Date(currentDate),
+    });
+
+    currentDate.setMonth(currentMonth - 1); // Move to the previous month
+  }
+
+  return months.reverse(); // Reversing the array to get the months in chronological order
 }
