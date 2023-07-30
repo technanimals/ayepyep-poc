@@ -36,12 +36,9 @@ export function Dashboard() {
     },
   });
 
-  const revenue =
-    revenueIsLoading || !revenueData?.revenue
-      ? "...Loading"
-      : revenueData?.revenue;
+  const revenue = revenueIsLoading ? "...Loading" : revenueData?.revenue;
 
-  const orderCount = isLoading || !data?.count ? "...Loading" : data?.count;
+  const orderCount = isLoading ? "...Loading" : data?.count;
 
   return (
     <>
@@ -74,7 +71,7 @@ export function Dashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{revenue}</div>
               <p className="text-xs text-muted-foreground">
-                +20.1% from last month
+                {revenueData?.text || null}
               </p>
             </CardContent>
           </Card>
@@ -85,7 +82,7 @@ export function Dashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{orderCount}</div>
               <p className="text-xs text-muted-foreground">
-                +180.1% from last month
+                {data?.text || null}
               </p>
             </CardContent>
           </Card>

@@ -1,34 +1,81 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { getConnection } from "~/backend/connection";
-import { Order } from "~/backend/models";
+import { Order, OrderItem } from "~/backend/models";
+import startOfMonth from "date-fns/startOfMonth";
+import endOfMonth from "date-fns/endOfMonth";
+import subMonths from "date-fns/subMonths";
 
 import { QueryType } from "~/query";
 
+export const getRange = (date: string | Date) => ({
+  start: startOfMonth(new Date(date)),
+  end: endOfMonth(new Date(date)),
+});
+
 const getPizzasSales = async (order: "DESC" | "ASC", date: string) => {
   const db = await getConnection();
+  const data = await OrderItem.query(db)
+    .select("pizzas.name", db.raw("count(pizza_id) as count"))
+    .joinRelated("order")
+    .joinRelated("pizzas")
+    .where("date", "<=", endOfMonth(new Date(date)))
+    .where("date", ">=", startOfMonth(new Date(date)))
+    .groupBy("pizzas.name")
+    .orderBy("count", order)
+    .limit(5);
 
-  const { rows } = await db.raw(`
-  SELECT pizza.name, s.count, date FROM pizza
-  JOIN (
-    SELECT pizza_id, count(pizza_id) as count FROM order_item
-    GROUP BY pizza_id ORDER BY count ${order} LIMIT 5
-  ) s on s.pizza_id = pizza.id ORDER BY s.count ${order}
-  JOIN order ON order.id = order_item.order_id
-  `);
-  console.log(rows);
+  return data;
+};
 
-  return rows;
+export const getPercentageText = (
+  percentage: number,
+  query: Date,
+  previous: Date
+) => {
+  const now = new Date();
+
+  const isSameMonth = query.getMonth() === now.getMonth();
+
+  const sign = percentage > 0 ? "+" : "";
+
+  const text = isSameMonth
+    ? "from last month"
+    : `from ${previous.toLocaleString("en-US", { month: "long" })}`;
+
+  return `${sign}${percentage.toFixed(2)}% ${text}`;
 };
 
 const getTopPizzas = async (date: string) => getPizzasSales("DESC", date);
 const getWorstPizzas = async (date: string) => getPizzasSales("ASC", date);
 const countOrders = async (date: string) => {
+  const now = getRange(date);
+  const before = getRange(subMonths(new Date(date), 1));
   const db = await getConnection();
 
-  const data = await Order.query(db).count("*").first();
+  // @ts-ignore
+  const { count } = await Order.query(db)
+    .count("*")
+    .where("date", "<=", now.end)
+    .where("date", ">=", now.start)
+    .first();
 
-  return data;
+  // @ts-ignore
+  const { count: previous } = await Order.query(db)
+    .count("*")
+    .where("date", "<=", before.end)
+    .where("date", ">=", before.start)
+    .first();
+
+  const percentage = parseInt(
+    (((count - previous) / previous) * 100).toFixed(2)
+  );
+
+  return {
+    count,
+    percentage,
+    text: getPercentageText(percentage, now.start, before.start),
+  };
 };
 
 const queries: Record<QueryType, (date: string) => Promise<any>> = {
